@@ -9,10 +9,12 @@
     "@mui/material": "^6.0.0",
     "@types/react-transition-group": "^4.4.11",
     "firebase": "^10.13.0",
+    "framer-motion": "^11.3.30",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "react-transition-group": "^4.4.5"
+    "react-transition-group": "^4.4.5",
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
     "@types/react": "^18.3.4",

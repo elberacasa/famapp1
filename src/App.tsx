@@ -5,13 +5,12 @@ import TransactionList from './components/TransactionList';
 import AccountSummary from './components/AccountSummary';
 import FamilyDebts from './components/FamilyDebts';
 import ChatBot from './components/ChatBot';
-import Notes from './components/Notes'; // Import the new Notes component
-import { auth } from './firebase'; // Import auth from firebase.ts
+import Notes from './components/Notes';
+import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { Box, Container, CssBaseline, ThemeProvider, createTheme, Fade, Grow, Typography } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import Sidebar from './components/Sidebar';
-// Remove the Header import
-// import Header from './components/Header';
+import ThemeProvider from './components/ThemeProvider';
 
 export interface Transaction {
   id: number;
@@ -28,12 +27,8 @@ const SOURCES = ['Cash (USD)', 'Zelle', 'Banco Provincial (VES)'];
 const App: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [activeComponent, setActiveComponent] = useState<'summary' | 'form' | 'list' | 'debts' | 'chat' | 'notes'>('summary');
+  const [activeComponent, setActiveComponent] = useState<'summary' | 'form' | 'list' | 'debts' | 'chat' | 'notes' | 'insights'>('summary');
   const [user, setUser] = useState<any | null>(null);
-
-  useEffect(() => {
-    // Add sample transactions (omitted for brevity)
-  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -61,58 +56,8 @@ const App: React.FC = () => {
     setIsDarkMode(prevMode => !prevMode);
   };
 
-  const theme = createTheme({
-    palette: {
-      mode: isDarkMode ? 'dark' : 'light',
-      primary: {
-        main: '#4CAF50',
-      },
-    },
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            },
-          },
-        },
-      },
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: '0 6px 12px rgba(0, 0, 0, 0.1)',
-            },
-          },
-        },
-      },
-      MuiFormGroup: {
-        styleOverrides: {
-          root: {
-            display: 'flex',
-            justifyContent: 'center',
-          },
-        },
-      },
-      MuiFormControlLabel: {
-        styleOverrides: {
-          root: {
-            marginLeft: 0,
-            marginRight: 0,
-          },
-        },
-      },
-    },
-  });
-
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <ThemeProvider isDarkMode={isDarkMode}>
       <Box sx={{ display: 'flex' }}>
         <Sidebar
           activeComponent={activeComponent}
@@ -122,36 +67,26 @@ const App: React.FC = () => {
         />
         <Box component="main" sx={{ flexGrow: 1, p: 3, display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
           <Container maxWidth="sm" sx={{ mt: 4 }}>
-            <Fade in={true} timeout={500}>
-              <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {activeComponent === 'summary' && <AccountSummary transactions={transactions} isDarkMode={isDarkMode} />}
-                {activeComponent === 'form' && (
-                  <Grow in={true} timeout={500}>
-                    <Box sx={{ width: '100%' }}>
-                      <TransactionForm 
-                        addTransaction={addTransaction} 
-                        categories={CATEGORIES}
-                        sources={SOURCES}
-                        isDarkMode={isDarkMode}
-                      />
-                    </Box>
-                  </Grow>
-                )}
-                {activeComponent === 'list' && (
-                  <TransactionList 
-                    transactions={transactions} 
-                    editTransaction={editTransaction}
-                    removeTransaction={removeTransaction}
-                    categories={CATEGORIES}
-                    sources={SOURCES}
-                    isDarkMode={isDarkMode}
-                  />
-                )}
-                {activeComponent === 'debts' && <FamilyDebts isDarkMode={isDarkMode} />}
-                {activeComponent === 'chat' && <ChatBot transactions={transactions} isDarkMode={isDarkMode} />}
-                {activeComponent === 'notes' && <Notes />}
-              </Box>
-            </Fade>
+            {activeComponent === 'summary' && <AccountSummary transactions={transactions} isDarkMode={isDarkMode} />}
+            {activeComponent === 'form' && (
+              <TransactionForm 
+                addTransaction={addTransaction} 
+                categories={CATEGORIES}
+                sources={SOURCES}
+                isDarkMode={isDarkMode}
+              />
+            )}
+            {activeComponent === 'list' && (
+              <TransactionList 
+                transactions={transactions} 
+                editTransaction={editTransaction}
+                removeTransaction={removeTransaction}
+                isDarkMode={isDarkMode}
+              />
+            )}
+            {activeComponent === 'debts' && <FamilyDebts isDarkMode={isDarkMode} />}
+            {activeComponent === 'chat' && <ChatBot transactions={transactions} isDarkMode={isDarkMode} />}
+            {activeComponent === 'notes' && <Notes />}
           </Container>
         </Box>
       </Box>
