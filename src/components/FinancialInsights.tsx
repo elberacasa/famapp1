@@ -1,13 +1,18 @@
 import React from 'react';
+import { Typography, Grid, Box } from '@mui/material';
+import { PieChart, Pie, Cell, Legend, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import { Transaction } from '../App';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
-import { Box, Typography, Grid } from '@mui/material';
 
 interface Props {
   transactions: Transaction[];
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+
+type PieChartLabelProps = {
+  name: string;
+  percent: number;
+};
 
 const FinancialInsights: React.FC<Props> = ({ transactions }) => {
   const categoryTotals = transactions.reduce((acc, transaction) => {
@@ -34,13 +39,12 @@ const FinancialInsights: React.FC<Props> = ({ transactions }) => {
           <PieChart width={400} height={400}>
             <Pie
               data={pieChartData}
-              cx={200}
-              cy={200}
-              labelLine={false}
+              cx="50%"
+              cy="50%"
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              label={({ name, percent }: PieChartLabelProps) => `${name} ${(percent * 100).toFixed(0)}%`}
             >
               {pieChartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
