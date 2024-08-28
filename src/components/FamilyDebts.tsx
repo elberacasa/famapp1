@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { Box, Typography, TextField, Button, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Grid } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Debt {
   id: number;
@@ -33,52 +34,72 @@ const FamilyDebts: React.FC<Props> = ({ isDarkMode }) => {
   };
 
   return (
-    <div className={`family-debts ${isDarkMode ? 'dark' : ''}`}>
-      <h2>Family Debts</h2>
-      <form onSubmit={addDebt} className="debt-form">
-        <input
-          type="text"
-          placeholder="From"
-          value={newDebt.from}
-          onChange={(e) => setNewDebt({ ...newDebt, from: e.target.value })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="To"
-          value={newDebt.to}
-          onChange={(e) => setNewDebt({ ...newDebt, to: e.target.value })}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Amount"
-          value={newDebt.amount}
-          onChange={(e) => setNewDebt({ ...newDebt, amount: parseFloat(e.target.value) })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Description"
-          value={newDebt.description}
-          onChange={(e) => setNewDebt({ ...newDebt, description: e.target.value })}
-          required
-        />
-        <button type="submit">Add Debt</button>
-      </form>
-      <TransitionGroup className="debt-list">
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+      <Typography variant="h4" gutterBottom>
+        Family Debts
+      </Typography>
+      <Box component="form" onSubmit={addDebt} sx={{ width: '100%', mb: 3 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="From"
+              value={newDebt.from}
+              onChange={(e) => setNewDebt({ ...newDebt, from: e.target.value })}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="To"
+              value={newDebt.to}
+              onChange={(e) => setNewDebt({ ...newDebt, to: e.target.value })}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Amount"
+              type="number"
+              value={newDebt.amount}
+              onChange={(e) => setNewDebt({ ...newDebt, amount: parseFloat(e.target.value) })}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Description"
+              value={newDebt.description}
+              onChange={(e) => setNewDebt({ ...newDebt, description: e.target.value })}
+              required
+            />
+          </Grid>
+        </Grid>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+          <Button type="submit" variant="contained" color="primary" size="large">
+            Add Debt
+          </Button>
+        </Box>
+      </Box>
+      <List sx={{ width: '100%' }}>
         {debts.map((debt) => (
-          <CSSTransition key={debt.id} timeout={300} classNames="fade">
-            <div className="debt-item">
-              <span>{debt.from} owes {debt.to}</span>
-              <span>${debt.amount.toFixed(2)}</span>
-              <span>{debt.description}</span>
-              <button onClick={() => removeDebt(debt.id)}>Remove</button>
-            </div>
-          </CSSTransition>
+          <ListItem key={debt.id} sx={{ bgcolor: 'background.paper', mb: 1, borderRadius: 1 }}>
+            <ListItemText
+              primary={`${debt.from} owes ${debt.to}`}
+              secondary={`$${debt.amount.toFixed(2)} - ${debt.description}`}
+            />
+            <ListItemSecondaryAction>
+              <IconButton edge="end" aria-label="delete" onClick={() => removeDebt(debt.id)}>
+                <DeleteIcon />
+              </IconButton>
+            </ListItemSecondaryAction>
+          </ListItem>
         ))}
-      </TransitionGroup>
-    </div>
+      </List>
+    </Box>
   );
 };
 

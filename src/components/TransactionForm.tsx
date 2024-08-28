@@ -1,22 +1,19 @@
 import React, { useState, FormEvent } from 'react';
 import { Transaction } from '../App';
+import { Box, Button, Grid, TextField, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
 interface Props {
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   isDarkMode: boolean;
   categories: string[];
   sources: string[];
-  addCategory: (category: string) => void;
-  addSource: (source: string) => void;
 }
 
-const TransactionForm: React.FC<Props> = ({ addTransaction, isDarkMode, categories, sources, addCategory, addSource }) => {
+const TransactionForm: React.FC<Props> = ({ addTransaction, isDarkMode, categories, sources }) => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [source, setSource] = useState('');
   const [category, setCategory] = useState('');
-  const [newCategory, setNewCategory] = useState('');
-  const [newSource, setNewSource] = useState('');
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -33,77 +30,71 @@ const TransactionForm: React.FC<Props> = ({ addTransaction, isDarkMode, categori
     setCategory('');
   };
 
-  const handleAddCategory = () => {
-    if (newCategory.trim()) {
-      addCategory(newCategory.trim());
-      setNewCategory('');
-    }
-  };
-
-  const handleAddSource = () => {
-    if (newSource.trim()) {
-      addSource(newSource.trim());
-      setNewSource('');
-    }
-  };
-
   return (
-    <form onSubmit={handleSubmit} className={`transaction-form ${isDarkMode ? 'dark' : ''}`}>
-      <h2>Add New Transaction</h2>
-      <input
-        type="number"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        placeholder="Amount"
-        required
-      />
-      <input
-        type="text"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Description"
-        required
-      />
-      <select
-        value={source}
-        onChange={(e) => setSource(e.target.value)}
-        required
-      >
-        <option value="">Select source</option>
-        {sources.map((s) => (
-          <option key={s} value={s}>{s}</option>
-        ))}
-      </select>
-      <div className="custom-input">
-        <input
-          type="text"
-          value={newSource}
-          onChange={(e) => setNewSource(e.target.value)}
-          placeholder="Add new source"
-        />
-        <button type="button" onClick={handleAddSource}>Add</button>
-      </div>
-      <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        required
-      >
-        <option value="">Select category</option>
-        {categories.map((c) => (
-          <option key={c} value={c}>{c}</option>
-        ))}
-      </select>
-      <div className="custom-input">
-        <input
-          type="text"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-          placeholder="Add new category"
-        />
-        <button type="button" onClick={handleAddCategory}>Add</button>
-      </div>
-      <button type="submit">Add Transaction</button>
-    </form>
+    <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Amount"
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            <InputLabel>Source</InputLabel>
+            <Select
+              value={source}
+              label="Source"
+              onChange={(e) => setSource(e.target.value)}
+              required
+            >
+              {sources.map((s) => (
+                <MenuItem key={s} value={s}>{s}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={category}
+              label="Category"
+              onChange={(e) => setCategory(e.target.value)}
+              required
+            >
+              {categories.map((c) => (
+                <MenuItem key={c} value={c}>{c}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          size="large"
+          sx={{ minWidth: 200 }}
+        >
+          Add Transaction
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

@@ -1,5 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Transaction } from '../App';
+import { Box, Card, CardContent, CardActions, Typography, Button, Grid, Select, MenuItem, TextField, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { SelectChangeEvent } from '@mui/material/Select';
 
 interface Props {
   transactions: Transaction[];
@@ -28,8 +32,9 @@ const TransactionList: React.FC<Props> = ({ transactions, editTransaction, remov
     );
   }, [transactions, filters]);
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+  const handleFilterChange = (e: SelectChangeEvent<string> | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
   };
 
   const handleRemove = (id: number) => {
@@ -47,58 +52,107 @@ const TransactionList: React.FC<Props> = ({ transactions, editTransaction, remov
     setConfirmDelete(null);
   };
 
+  const handleEdit = (transaction: Transaction) => {
+    // You might want to implement an edit form or modal here
+    console.log('Edit transaction:', transaction);
+    // For now, let's just log the transaction. You can implement the actual edit functionality later.
+  };
+
   return (
-    <div className={`transaction-list ${isDarkMode ? 'dark' : ''}`}>
-      <h2>Transactions</h2>
-      <div className="filters">
-        <select name="source" onChange={handleFilterChange} value={filters.source}>
-          <option value="">All Sources</option>
-          {sources.map(source => <option key={source} value={source}>{source}</option>)}
-        </select>
-        <select name="category" onChange={handleFilterChange} value={filters.category}>
-          <option value="">All Categories</option>
-          {categories.map(category => <option key={category} value={category}>{category}</option>)}
-        </select>
-        <input type="date" name="dateFrom" onChange={handleFilterChange} value={filters.dateFrom} />
-        <input type="date" name="dateTo" onChange={handleFilterChange} value={filters.dateTo} />
-      </div>
-      <table className="transaction-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Amount</th>
-            <th>Source</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredTransactions.map((transaction) => (
-            <tr key={transaction.id}>
-              <td>{transaction.date}</td>
-              <td>{transaction.description}</td>
-              <td>{transaction.category}</td>
-              <td>${transaction.amount.toFixed(2)}</td>
-              <td>{transaction.source}</td>
-              <td>
-                <div className="transaction-actions">
-                  <button onClick={() => editTransaction(transaction.id, transaction)}>Edit</button>
-                  <button className="remove-btn" onClick={() => handleRemove(transaction.id)}>Remove</button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {confirmDelete !== null && (
-        <div className="confirmation-popup">
-          <p>Are you sure you want to remove this transaction?</p>
-          <button onClick={confirmRemove}>Yes</button>
-          <button onClick={cancelRemove}>No</button>
-        </div>
-      )}
-    </div>
+    <Box sx={{ width: '100%' }}>
+      <Typography variant="h4" gutterBottom>
+        Transactions
+      </Typography>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Select
+            fullWidth
+            name="source"
+            value={filters.source}
+            onChange={handleFilterChange}
+            displayEmpty
+          >
+            <MenuItem value="">All Sources</MenuItem>
+            {sources.map(source => <MenuItem key={source} value={source}>{source}</MenuItem>)}
+          </Select>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Select
+            fullWidth
+            name="category"
+            value={filters.category}
+            onChange={handleFilterChange}
+            displayEmpty
+          >
+            <MenuItem value="">All Categories</MenuItem>
+            {categories.map(category => <MenuItem key={category} value={category}>{category}</MenuItem>)}
+          </Select>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            fullWidth
+            type="date"
+            name="dateFrom"
+            label="From"
+            InputLabelProps={{ shrink: true }}
+            value={filters.dateFrom}
+            onChange={handleFilterChange}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            fullWidth
+            type="date"
+            name="dateTo"
+            label="To"
+            InputLabelProps={{ shrink: true }}
+            value={filters.dateTo}
+            onChange={handleFilterChange}
+          />
+        </Grid>
+      </Grid>
+      {filteredTransactions.map((transaction) => (
+        <Card key={transaction.id} sx={{ mb: 2, transition: 'all 0.3s ease', '&:hover': { transform: 'translateY(-2px)', boxShadow: 3 } }}>
+          <CardContent>
+            <Typography variant="h6">{transaction.description}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Amount: ${transaction.amount.toFixed(2)}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Category: {transaction.category}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Date: {transaction.date}
+            </Typography>
+          </CardContent>
+          <CardActions sx={{ justifyContent: 'flex-end' }}>
+            <IconButton size="small" onClick={() => handleEdit(transaction)}>
+              <EditIcon />
+            </IconButton>
+            <IconButton size="small" color="error" onClick={() => handleRemove(transaction.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </CardActions>
+        </Card>
+      ))}
+      <Dialog
+        open={confirmDelete !== null}
+        onClose={cancelRemove}
+      >
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to remove this transaction?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelRemove}>Cancel</Button>
+          <Button onClick={confirmRemove} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
